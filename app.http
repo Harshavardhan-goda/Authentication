@@ -8,3 +8,23 @@ Content-Type: application/json
   "gender": "male",
   "location": "Detroit"
 }
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "adam_richard8",
+  "password": "richard_5678"
+}
+###
+
+
+PUT http://localhost:3000/change-password
+Content-Type: application/json
+
+{
+  "username": "adam_richard",
+  "oldPassword": "richard_567",
+  "newPassword": "richard@123"
+}

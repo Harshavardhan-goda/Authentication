@@ -33,7 +33,7 @@ app.post("/register", async (request, response) => {
   const dbUser = await db.get(getUserQuery);
   if (dbUser !== undefined) {
     response.status(400);
-    response.send("User Already exists");
+    response.send("User already exists");
   } else if (password.length < 5) {
     response.status(400);
     response.send("Password is too short");
@@ -71,6 +71,38 @@ app.post("/login", async (request, response) => {
     } else {
       response.status(200);
       response.send("Login success!");
+    }
+  }
+});
+//Update Password API
+app.put("/change-password", async (request, response) => {
+  const { username, oldPassword, newPassword } = request.body;
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const getUserQuery = `
+        SELECT * FROM user WHERE username = '${username}';`;
+  const dbUser = await db.get(getUserQuery);
+  if (dbUser === undefined) {
+    response.status(400);
+    response.send("User not registered");
+  } else {
+    const isPasswordCompare = await bcrypt.compare(
+      oldPassword,
+      dbUser.password
+    );
+    if (isPasswordCompare === false) {
+      response.status(400);
+      response.send("Invalid current password");
+    } else if (newPassword.length < 5) {
+      response.status(400);
+      response.send("Password is too short");
+    } else {
+      const updatePasswordQuery = `
+        UPDATE user 
+        SET password = '${hashedPassword}'
+        WHERE username = '${username}';`;
+      await db.run(updatePasswordQuery);
+      response.status(200);
+      response.send("Password updated");
     }
   }
 });
